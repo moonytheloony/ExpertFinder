@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Application Name="fabric:/Ignite.ExpertFinder" xmlns="http://schemas.microsoft.com/2011/01/fabric" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/Ignite.ExpertFinder" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
+    <Parameter Name="Detection_MinReplicaSetSize" Value="1" />
+    <Parameter Name="Detection_TargetReplicaSetSize" Value="1" />
+    <Parameter Name="Registration_MinReplicaSetSize" Value="1" />
+    <Parameter Name="Registration_TargetReplicaSetSize" Value="1" />
     <Parameter Name="Dashboard_InstanceCount" Value="1" />
   </Parameters>
 </Application>

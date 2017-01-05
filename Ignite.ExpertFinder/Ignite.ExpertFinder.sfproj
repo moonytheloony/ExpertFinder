@@ -30,6 +30,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ignite.ExpertFinder.Dashboard\Ignite.ExpertFinder.Dashboard.xproj" />
+    <ProjectReference Include="..\Ignite.ExpertFinder.Detection\Ignite.ExpertFinder.Detection.csproj" />
+    <ProjectReference Include="..\Ignite.ExpertFinder.Registration\Ignite.ExpertFinder.Registration.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>
