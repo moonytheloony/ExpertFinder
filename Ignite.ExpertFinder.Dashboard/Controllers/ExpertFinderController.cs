@@ -24,7 +24,7 @@
         public ActionResult DetectExperts(string imageUri)
         {
             var stubResponse = new Verdict();
-            stubResponse.isFaceDetected = true;
+            stubResponse.IsFaceDetected = true;
             var experts = new List<Expert>();
             var skills = new List<Skills>();
             skills.Add(Skills.Architecture);
@@ -32,14 +32,14 @@
             skills.Add(Skills.HoloLens);
             skills.Add(Skills.Development);
             experts.Add(new Expert()
-                {
-                    name = "Rahul",
-                    organization = "Readify",
-                    profilePicBlobURL = "https://holoinput.blob.core.windows.net/registration/profilePicture.jpg",
-                   skills = skills
-                });
+            {
+                Name = "Rahul",
+                Organization = "Readify",
+                ProfilePicBlobUrl = "https://holoinput.blob.core.windows.net/registration/profilePicture.jpg",
+                Skills = skills
+            });
 
-            stubResponse.experts = experts;
+            stubResponse.Experts = experts;
             return this.Ok(stubResponse);
         }
 

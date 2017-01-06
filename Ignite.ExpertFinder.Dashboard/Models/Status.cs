@@ -7,8 +7,8 @@ namespace Ignite.ExpertFinder.Dashboard.Models
 {
     public class Status
     {
-        public bool isComplete;
-        public Verdict detectionVerdict;
+        public bool IsComplete;
+        public Verdict DetectionVerdict;
     }
 
 }

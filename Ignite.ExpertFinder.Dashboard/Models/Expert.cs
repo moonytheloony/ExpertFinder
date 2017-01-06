@@ -4,9 +4,9 @@ namespace Ignite.ExpertFinder.Dashboard.Models
 
     public class Expert
     {
-        public string name;
-        public string organization;
-        public string profilePicBlobURL;
-        public List<Skills> skills;
+        public string Name;
+        public string Organization;
+        public string ProfilePicBlobUrl;
+        public List<Skills> Skills;
     }
 }

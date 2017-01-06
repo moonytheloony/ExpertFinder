@@ -4,7 +4,7 @@
 
     public class Verdict
     {
-        public bool isFaceDetected;
-        public List<Expert> experts;
+        public bool IsFaceDetected;
+        public List<Expert> Experts;
     }
 }

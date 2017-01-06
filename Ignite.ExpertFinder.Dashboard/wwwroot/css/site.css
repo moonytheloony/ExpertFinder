@@ -1,38 +1,68 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    background-color: #34515E;
+    font-family: 'Open Sans Condensed', sans-serif;
+    color: white;
+    font-size: 18px;
 }
 
-/* Wrapping element */
-/* Set some basic padding to keep content from hitting the edges */
+.footer {
+    padding: 30px;
+}
+
+.navbar-brand {
+    color: white !important;
+    font-size: 20px;
+    font-weight: bold;
+}
+
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    min-height: 90vh;
 }
 
-/* Set widths on the form inputs since otherwise they're 100% wide */
-input,
-select,
-textarea {
-    max-width: 280px;
+.action {
+    height: 50px;
+    width: 200px;
+    background-color: tomato;
+    border-radius: 0px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border: none !important;
+    margin-bottom: 5px;
 }
 
-/* Carousel */
-.carousel-caption p {
-    font-size: 20px;
-    line-height: 1.4;
+    .action:hover {
+        color: white;
+        background-color: #aa422f;
+    }
+
+    .action:active {
+        color: white;
+        background-color: #aa422f;
+    }
+
+.submit {
+    height: 50px;
+    width: 200px;
+    background-color: yellowgreen;
+    border-radius: 0px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border: none !important;
+    margin-bottom: 5px;
 }
 
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"]
-{
-    width: 100%;
-}
+    .submit:hover {
+        color: white;
+        background-color: darkolivegreen;
+    }
 
-/* Hide/rearrange for smaller screens */
-@media screen and (max-width: 767px) {
-  /* Hide captions */
-  .carousel-caption {
-    display: none
-  }
-}
+    .submit:active {
+        color: white;
+        background-color: darkolivegreen;
+    }
