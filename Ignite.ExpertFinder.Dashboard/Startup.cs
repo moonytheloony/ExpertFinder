@@ -34,6 +34,7 @@ namespace Ignite.ExpertFinder.Dashboard
             {
                 jsonOptions.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
             }); ;
+            services.AddCookieTempData();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

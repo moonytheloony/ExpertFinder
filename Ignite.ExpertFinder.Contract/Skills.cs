@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Ignite.ExpertFinder.Dashboard.Models
+﻿namespace Ignite.ExpertFinder.Contract
 {
     public enum Skills
     {

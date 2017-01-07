@@ -57,6 +57,12 @@
         return false;
     }
 </script>
+@if ((string)ViewData?["SubmissionStatus"] != null)
+{
+    <div class="alert alert-info">
+        <strong>Message! </strong>@ViewData["SubmissionStatus"]
+    </div>
+}
 <h2>Step 1. Upload Your Picture</h2>
 <hr />
 <div class="container-fluid">

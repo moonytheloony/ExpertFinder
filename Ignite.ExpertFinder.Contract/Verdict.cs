@@ -1,4 +1,4 @@
-﻿namespace Ignite.ExpertFinder.Dashboard.Models
+﻿namespace Ignite.ExpertFinder.Contract
 {
     using System.Collections.Generic;
 

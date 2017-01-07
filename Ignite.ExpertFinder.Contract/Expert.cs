@@ -1,9 +1,10 @@
-namespace Ignite.ExpertFinder.Dashboard.Models
+namespace Ignite.ExpertFinder.Contract
 {
     using System.Collections.Generic;
 
     public class Expert
     {
+        public string Id;
         public string Name;
         public string Organization;
         public string ProfilePicBlobUrl;

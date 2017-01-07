@@ -13,6 +13,7 @@ namespace Ignite.ExpertFinder.Dashboard.Controllers
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Primitives;
     using Microsoft.ProjectOxford.Face;
+    using Microsoft.ProjectOxford.Face.Contract;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -27,14 +28,40 @@ namespace Ignite.ExpertFinder.Dashboard.Controllers
 
         public IActionResult Index()
         {
+            this.ViewData["SubmissionStatus"] = this.TempData["SubmissionStatus"];
             var expert = new Expert();
             return this.View(expert);
         }
 
         [HttpPost]
-        public IActionResult Submit()
+        public async Task<IActionResult> Submit()
         {
-            return this.View("Index");
+            // Collect data.
+            var expert = new Expert
+            {
+                Name = this.Request.Form["Name"].ToString(),
+                Organization = this.Request.Form["Organization"].ToString(),
+                ProfilePicBlobUrl = this.Request.Form["ProfilePicBlobUrl"].ToString(),
+                Skills = new List<Skills>()
+            };
+            foreach (var skillString in this.Request.Form["Skills"].ToString().Split(','))
+            {
+                expert.Skills.Add((Skills)Enum.Parse(typeof(Skills), skillString, true));
+            }
+
+            //Add oerson to face list
+            var faceServiceClient = new FaceServiceClient("041b73258acc45c69ff27dc5bea5bc8a");
+            string personGroupId = "ignitetest";
+            await faceServiceClient.CreatePersonGroupAsync(personGroupId, "ignitees");
+
+            CreatePersonResult friend1 = await faceServiceClient.CreatePersonAsync(personGroupId,expert.Name);
+            await faceServiceClient.AddPersonFaceAsync(personGroupId, friend1.PersonId, expert.ProfilePicBlobUrl, expert.Name);
+            // In service this would be different. https://www.microsoft.com/cognitive-services/en-us/face-api/documentation/face-api-how-to-topics/howtoidentifyfacesinimage
+            await faceServiceClient.TrainPersonGroupAsync(personGroupId);
+
+
+            this.TempData["SubmissionStatus"] = "Details saved successfully.";
+            return this.RedirectToAction("Index");
         }
 
         public async Task<IActionResult> GetCapturedImage()
@@ -70,13 +97,7 @@ namespace Ignite.ExpertFinder.Dashboard.Controllers
 
                 var faceServiceClient = new FaceServiceClient("041b73258acc45c69ff27dc5bea5bc8a");
                 var faces = await faceServiceClient.DetectAsync(sourceImageUri.ToString());
-                //Test feature
-                //faceServiceClient.CreateFaceListAsync("test", "test", "ignitefaces");
-                //faceServiceClient.AddFaceToFaceListAsync("test", )
-
                 return this.Json(faces.Length == 1 ? "One face detected. Please proceed with registration." : "Unusable image. Please clear the area, stand straight and capture another picture.");
-
-
             }
             catch (Exception ex)
             {

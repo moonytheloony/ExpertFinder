@@ -3,8 +3,6 @@
   <Parameters>
     <Parameter Name="Detection_MinReplicaSetSize" Value="3" />
     <Parameter Name="Detection_TargetReplicaSetSize" Value="3" />
-    <Parameter Name="Registration_MinReplicaSetSize" Value="3" />
-    <Parameter Name="Registration_TargetReplicaSetSize" Value="3" />
     <Parameter Name="Dashboard_InstanceCount" Value="-1" />
   </Parameters>
 </Application>
