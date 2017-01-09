@@ -35,6 +35,9 @@
   "frameworks": {
     "net452": {
       "dependencies": {
+        "Ignite.ExpertFinder.Contract": {
+          "target": "project"
+        }
       }
     }
   },

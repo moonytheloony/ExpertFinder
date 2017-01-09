@@ -1,5 +1,6 @@
 ﻿namespace Ignite.ExpertFinder.Detection
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -31,6 +32,12 @@
             await this.faceServiceClient.AddPersonFaceAsync(this.groupId, person.PersonId, profilePictureUri, personId);
         }
 
+        public async Task<bool> IsImageUsable(string pictureUri)
+        {
+            var faces = await this.faceServiceClient.DetectAsync(pictureUri);
+            return faces.Length == 1;
+        }
+
         public async Task<IList<string>> DetectFacesInPicture(string pictureUri)
         {
             var identifiedPeopleIds = new List<string>();
@@ -54,6 +61,7 @@
 
         public async void TrainGroup()
         {
+            await this.faceServiceClient.TrainPersonGroupAsync(this.groupId);
             while (true)
             {
                 var trainingStatus = await this.faceServiceClient.GetPersonGroupTrainingStatusAsync(this.groupId);
@@ -62,13 +70,17 @@
                     break;
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(TimeSpan.FromSeconds(1));
             }
         }
 
         private async Task InitializeAsync()
         {
-            await this.faceServiceClient.CreatePersonGroupAsync(this.groupId, this.groupName);
+            var expertGroup = await this.faceServiceClient.GetPersonGroupAsync(this.groupId);
+            if (null == expertGroup)
+            {
+                await this.faceServiceClient.CreatePersonGroupAsync(this.groupId, this.groupName);
+            }
         }
     }
 }

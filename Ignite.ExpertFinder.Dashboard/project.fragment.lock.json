@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "exports": {
+    "Ignite.ExpertFinder.Contract/1.0.0": {
+      "type": "project",
+      "framework": ".NETStandard,Version=v1.1",
+      "compile": {
+        "bin/Debug/Ignite.ExpertFinder.Contract.dll": {}
+      },
+      "runtime": {
+        "../packages/Microsoft.ServiceFabric.Services.2.4.145/lib/net45/Microsoft.ServiceFabric.Services.dll": {},
+        "bin/Debug/Ignite.ExpertFinder.Contract.dll": {}
+      },
+      "contentFiles": {
+        "bin/Debug/Ignite.ExpertFinder.Contract.pdb": {
+          "buildAction": "None",
+          "codeLanguage": "any",
+          "copyToOutput": true
+        }
+      }
+    }
+  }
+}

@@ -11,6 +11,8 @@
 
     using Microsoft.ServiceFabric.Data.Collections;
     using Microsoft.ServiceFabric.Services.Communication.Runtime;
+    using Microsoft.ServiceFabric.Services.Remoting;
+    using Microsoft.ServiceFabric.Services.Remoting.Runtime;
     using Microsoft.ServiceFabric.Services.Runtime;
 
     using Newtonsoft.Json;
@@ -18,12 +20,11 @@
     internal sealed class Detection : StatefulService, IExpertFinderOperations
     {
         private const string UserProfileDictionary = "expertprofiles";
+        private const string TrainingRequestsQueue = "trainingrequests";
 
         private readonly StatefulServiceContext context;
 
         private readonly FaceDetection faceDetection;
-
-        private Task trainingTask;
 
         public Detection(StatefulServiceContext context)
             : base(context)
@@ -51,21 +52,16 @@
                         await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
                             UserProfileDictionary);
                     await userProfileDictionary.TryAddAsync(tx, expert.Id, JsonConvert.SerializeObject(expert));
+                    var trainingRequestsQueue =
+                       await this.StateManager.GetOrAddAsync<IReliableQueue<bool>>(TrainingRequestsQueue);
+                    await trainingRequestsQueue.EnqueueAsync(tx, true);
                     await tx.CommitAsync();
                 }
-
-                // Launch training method. Return to caller.
-                this.trainingTask = Task.Run(() => this.faceDetection.TrainGroup());
             }
             catch (Exception e)
             {
                 ServiceEventSource.Current.Message(e.ToString());
             }
-        }
-
-        public TaskStatus CheckTrainingStatus()
-        {
-            return this.trainingTask?.Status ?? TaskStatus.WaitingForActivation;
         }
 
         public async Task<IEnumerable<Expert>> DetectExperts(string imageUri)
@@ -101,13 +97,54 @@
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return new ServiceReplicaListener[0];
+            return new[] { new ServiceReplicaListener(this.CreateServiceRemotingListener) };
         }
 
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            await this.faceDetection.Initialize;
-            cancellationToken.WaitHandle.WaitOne();
+            try
+            {
+                await this.faceDetection.Initialize;
+                await Task.Factory.StartNew(this.ProcessTrainingRequests, cancellationToken);
+                cancellationToken.WaitHandle.WaitOne();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+        }
+
+        private async Task ProcessTrainingRequests()
+        {
+            var trainingRequestsQueue = await this.StateManager.GetOrAddAsync<IReliableQueue<bool>>(TrainingRequestsQueue);
+            while (true)
+            {
+                using (var tx = this.StateManager.CreateTransaction())
+                {
+                    var message = trainingRequestsQueue.TryDequeueAsync(tx).Result;
+                    if (message.HasValue)
+                    {
+                        this.faceDetection.TrainGroup();
+                    }
+
+                    await tx.CommitAsync();
+                }
+                Thread.Sleep(TimeSpan.FromSeconds(5));
+            }
+        }
+
+        public async Task<string> ValidateImage(string imageUri)
+        {
+            try
+            {
+                return await this.faceDetection.IsImageUsable(imageUri) ? "One face detected. Please proceed with registration." : "Unusable image. Please clear the area, stand straight and capture another picture.";
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
         }
     }
 }

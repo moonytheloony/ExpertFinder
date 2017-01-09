@@ -7,12 +7,14 @@ namespace Ignite.ExpertFinder.Contract
 {
     using System.Threading.Tasks;
 
-    public interface IExpertFinderOperations
+    using Microsoft.ServiceFabric.Services.Remoting;
+
+    public interface IExpertFinderOperations : IService
     {
         Task AddExpertProfile(Expert expert);
 
         Task<IEnumerable<Expert>> DetectExperts(string imageUri);
 
-        TaskStatus CheckTrainingStatus();
+        Task<string> ValidateImage(string imageUri);
     }
 }
