@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Fabric;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Ignite.ExpertFinder.Contract;
@@ -28,9 +29,14 @@
             return await this.detectionServiceClient.ValidateImage(imageUri);
         }
 
-        public async Task<IEnumerable<Expert>> DetectExperts(string imageUri)
+        public async Task<Verdict> DetectExperts(string imageUri)
         {
-            return await this.detectionServiceClient.DetectExperts(imageUri);
+            var verdict = new Verdict();
+            var experts = await this.detectionServiceClient.DetectExperts(imageUri);
+            var verdictExperts = experts as IList<Expert> ?? experts.ToList();
+            verdict.IsFaceDetected = verdictExperts.Any();
+            verdict.Experts = verdictExperts;
+            return verdict;
         }
     }
 }

@@ -26,10 +26,17 @@
 
         public Task Initialize { get; private set; }
 
-        public async void AddPersonToGroup(string personId, string profilePictureUri)
+        public async Task<Guid> AddPersonToGroup(string personId, string profilePictureUri, Guid existingPersonId = default(Guid))
         {
-            var person = await this.faceServiceClient.CreatePersonAsync(this.groupId, personId);
-            await this.faceServiceClient.AddPersonFaceAsync(this.groupId, person.PersonId, profilePictureUri, personId);
+            if (existingPersonId == Guid.Empty)
+            {
+                var person = await this.faceServiceClient.CreatePersonAsync(this.groupId, personId);
+                await this.faceServiceClient.AddPersonFaceAsync(this.groupId, person.PersonId, profilePictureUri);
+                return person.PersonId;
+            }
+
+            await this.faceServiceClient.AddPersonFaceAsync(this.groupId, existingPersonId, profilePictureUri);
+            return existingPersonId;
         }
 
         public async Task<bool> IsImageUsable(string pictureUri)
@@ -76,10 +83,16 @@
 
         private async Task InitializeAsync()
         {
-            var expertGroup = await this.faceServiceClient.GetPersonGroupAsync(this.groupId);
-            if (null == expertGroup)
+            try
             {
-                await this.faceServiceClient.CreatePersonGroupAsync(this.groupId, this.groupName);
+                await this.faceServiceClient.GetPersonGroupAsync(this.groupId);
+            }
+            catch (FaceAPIException e)
+            {
+                if (e.ErrorCode == "PersonGroupNotFound")
+                {
+                    await this.faceServiceClient.CreatePersonGroupAsync(this.groupId, this.groupName);
+                }
             }
         }
     }

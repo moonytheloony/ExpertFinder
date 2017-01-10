@@ -44,14 +44,37 @@
         {
             try
             {
-                expert.Id = Guid.NewGuid().ToString();
-                this.faceDetection.AddPersonToGroup(expert.Id, expert.ProfilePicBlobUrl);
+                // Find if this person exists.
                 using (var tx = this.StateManager.CreateTransaction())
                 {
                     var userProfileDictionary =
                         await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
                             UserProfileDictionary);
-                    await userProfileDictionary.TryAddAsync(tx, expert.Id, JsonConvert.SerializeObject(expert));
+                    var existingUser = await userProfileDictionary.TryGetValueAsync(tx, expert.Email);
+                    if (existingUser.HasValue)
+                    {
+                        var personId = Guid.Parse(JsonConvert.DeserializeObject<Expert>(existingUser.Value).Id);
+                        await this.faceDetection.AddPersonToGroup(null, expert.ProfilePicBlobUrl, personId);
+                        var trainingRequestsQueue =
+                            await this.StateManager.GetOrAddAsync<IReliableQueue<bool>>(TrainingRequestsQueue);
+                        await trainingRequestsQueue.EnqueueAsync(tx, true);
+                    }
+
+                    await tx.CommitAsync();
+                    if (existingUser.HasValue)
+                    {
+                        return;
+                    }
+                }
+
+                var registeredUserId = await this.faceDetection.AddPersonToGroup(expert.Email, expert.ProfilePicBlobUrl);
+                using (var tx = this.StateManager.CreateTransaction())
+                {
+                    expert.Id = registeredUserId.ToString();
+                    var userProfileDictionary =
+                        await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
+                            UserProfileDictionary);
+                    await userProfileDictionary.TryAddAsync(tx, expert.Email, JsonConvert.SerializeObject(expert));
                     var trainingRequestsQueue =
                        await this.StateManager.GetOrAddAsync<IReliableQueue<bool>>(TrainingRequestsQueue);
                     await trainingRequestsQueue.EnqueueAsync(tx, true);

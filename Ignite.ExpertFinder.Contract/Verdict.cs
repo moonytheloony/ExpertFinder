@@ -5,6 +5,6 @@
     public class Verdict
     {
         public bool IsFaceDetected;
-        public List<Expert> Experts;
+        public IEnumerable<Expert> Experts;
     }
 }

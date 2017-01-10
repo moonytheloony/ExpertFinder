@@ -25,7 +25,7 @@
 
 .action {
     height: 50px;
-    width: 200px;
+    width: 320px;
     background-color: tomato;
     border-radius: 0px;
     font-size: 18px;
@@ -47,7 +47,7 @@
 
 .submit {
     height: 50px;
-    width: 200px;
+    width: 320px;
     background-color: yellowgreen;
     border-radius: 0px;
     font-size: 18px;

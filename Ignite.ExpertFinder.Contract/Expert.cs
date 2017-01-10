@@ -5,6 +5,7 @@ namespace Ignite.ExpertFinder.Contract
     public class Expert
     {
         public string Id;
+        public string Email;
         public string Name;
         public string Organization;
         public string ProfilePicBlobUrl;

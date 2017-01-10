@@ -3,15 +3,20 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
 
     using Contract;
+
+    using Microsoft.AspNetCore.Http;
+
     using Utilities;
 
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Primitives;
+    using Microsoft.Net.Http.Headers;
     using Microsoft.WindowsAzure.Storage;
 
     public class HomeController : Controller
@@ -69,22 +74,47 @@
             }
         }
 
+        public async Task<IActionResult> UploadImage()
+        {
+            var file = this.Request.Form.Files.FirstOrDefault();
+            if (null != file)
+            {
+                var storageAccount =
+                    CloudStorageAccount.Parse(this.configuration["ConnectionString:StorageConnectionString"]);
+                var blobClient = storageAccount.CreateCloudBlobClient();
+                var container = blobClient.GetContainerReference("registration");
+                var blockBlob = container.GetBlockBlobReference(file.Name);
+                await blockBlob.UploadFromStreamAsync(file.OpenReadStream());
+                var logBlob = container.GetBlockBlobReference("log.txt");
+                await logBlob.UploadTextAsync(blockBlob?.Uri.ToString());
+                return this.Content(blockBlob?.Uri.ToString());
+            }
+
+            return this.Content("");
+        }
+
         [HttpPost]
         public async Task<IActionResult> Submit()
         {
             var expert = new Expert
-                {
-                    Name = this.Request.Form["Name"].ToString(),
-                    Organization = this.Request.Form["Organization"].ToString(),
-                    ProfilePicBlobUrl = this.Request.Form["ProfilePicBlobUrl"].ToString(),
-                    Skills = new List<Skills>()
-                };
+            {
+                Email = this.Request.Form["Email"].ToString(),
+                Name = this.Request.Form["Name"].ToString(),
+                Organization = this.Request.Form["Organization"].ToString(),
+                ProfilePicBlobUrl = this.Request.Form["ProfilePicBlobUrl"].ToString(),
+                Skills = new List<Skills>()
+            };
             foreach (var skillString in this.Request.Form["Skills"].ToString().Split(','))
             {
+                if (skillString == string.Empty)
+                {
+                    continue;
+                }
+
                 expert.Skills.Add((Skills)Enum.Parse(typeof(Skills), skillString, true));
             }
 
-           try
+            try
             {
                 await this.communication.AddExpertProfile(expert);
             }
