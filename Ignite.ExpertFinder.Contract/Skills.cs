@@ -2,14 +2,31 @@
 {
     public enum Skills
     {
-        Azure,
-        Sharepoint,
+        DataPlatformAndAnalytics,
+        EnterpriseMobility,
+        DataCenterSystemCenter,
+        DataCenterWindowsServer,
+        Devices,
+        DynamicsCRMCRMOnPremise,
+        DynamicsERPNAVSMB,
+        ECSLicensing,
+        EMSIdentityandAccessManagementActiveDirectory,
+        EMSUnifiedDeviceManagementIntune,
+        EnterpriseCloudSuiteEMS,
+        Office365Exchange,
         SQLServer,
-        HoloLens,
-        Dynamics,
-        Architecture,
-        Testing,
-        O365,
-        Development
+        Win10DeploymentManagementIdentitySecurity,
+        AzureDataPlatformAnalytics,
+        AzureEnterpriseMobilityHybridIDAccess,
+        AzureIOTInternetOfThings,
+        AzureModernAppDeveloperCloudAppService,
+        AzureModernAppMediaSolutions,
+        AzureModernAppMobileEngagement,
+        AzureModernDCBusinessContinuityDisasterRecovery,
+        AzureModernDCCloudCompute,
+        AzureModernDCHybridCloudManagement,
+        AzureModernDCHybridStorage,
+        AzureModernDCSecurityCompliance,
+        AzureModernDCVirtualNetwork
     }
 }
