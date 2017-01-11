@@ -6,5 +6,6 @@
     {
         public bool IsFaceDetected;
         public IEnumerable<Expert> Experts;
+        public string Message { get; set; }
     }
 }

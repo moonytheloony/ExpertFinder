@@ -32,11 +32,19 @@
         public async Task<Verdict> DetectExperts(string imageUri)
         {
             var verdict = new Verdict();
-            var experts = await this.detectionServiceClient.DetectExperts(imageUri);
-            var verdictExperts = experts as IList<Expert> ?? experts.ToList();
-            verdict.IsFaceDetected = verdictExperts.Any();
-            verdict.Experts = verdictExperts;
-            return verdict;
+            try
+            {
+                var experts = await this.detectionServiceClient.DetectExperts(imageUri);
+                var verdictExperts = experts as IList<Expert> ?? experts.ToList();
+                verdict.IsFaceDetected = verdictExperts.Any();
+                verdict.Experts = verdictExperts;
+                return verdict;
+            }
+            catch (Exception e)
+            {
+               verdict.Message = e.ToString();
+                return verdict;
+            }
         }
     }
 }

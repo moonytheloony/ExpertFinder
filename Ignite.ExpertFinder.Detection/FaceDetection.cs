@@ -66,6 +66,11 @@
             return identifiedPeopleIds;
         }
 
+        public async Task TrainGroupAsync()
+        {
+            await this.faceServiceClient.TrainPersonGroupAsync(this.groupId);
+        }
+
         public async void TrainGroup()
         {
             await this.faceServiceClient.TrainPersonGroupAsync(this.groupId);

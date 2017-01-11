@@ -55,9 +55,10 @@
                     {
                         var personId = Guid.Parse(JsonConvert.DeserializeObject<Expert>(existingUser.Value).Id);
                         await this.faceDetection.AddPersonToGroup(null, expert.ProfilePicBlobUrl, personId);
-                        var trainingRequestsQueue =
-                            await this.StateManager.GetOrAddAsync<IReliableQueue<bool>>(TrainingRequestsQueue);
-                        await trainingRequestsQueue.EnqueueAsync(tx, true);
+                        await this.faceDetection.TrainGroupAsync();
+                        //var trainingRequestsQueue =
+                        //    await this.StateManager.GetOrAddAsync<IReliableQueue<bool>>(TrainingRequestsQueue);
+                        //await trainingRequestsQueue.EnqueueAsync(tx, true);
                     }
 
                     await tx.CommitAsync();
@@ -75,9 +76,10 @@
                         await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
                             UserProfileDictionary);
                     await userProfileDictionary.TryAddAsync(tx, expert.Email, JsonConvert.SerializeObject(expert));
-                    var trainingRequestsQueue =
-                       await this.StateManager.GetOrAddAsync<IReliableQueue<bool>>(TrainingRequestsQueue);
-                    await trainingRequestsQueue.EnqueueAsync(tx, true);
+                    await this.faceDetection.TrainGroupAsync();
+                    //var trainingRequestsQueue =
+                    //   await this.StateManager.GetOrAddAsync<IReliableQueue<bool>>(TrainingRequestsQueue);
+                    //await trainingRequestsQueue.EnqueueAsync(tx, true);
                     await tx.CommitAsync();
                 }
             }
@@ -89,33 +91,26 @@
 
         public async Task<IEnumerable<Expert>> DetectExperts(string imageUri)
         {
-            try
+            var experts = new List<Expert>();
+            var userIdList = await this.faceDetection.DetectFacesInPicture(imageUri);
+            using (var tx = this.StateManager.CreateTransaction())
             {
-                var experts = new List<Expert>();
-                var userIdList = await this.faceDetection.DetectFacesInPicture(imageUri);
-                using (var tx = this.StateManager.CreateTransaction())
+                var userProfileDictionary =
+                    await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
+                        UserProfileDictionary);
+                foreach (var userId in userIdList)
                 {
-                    var userProfileDictionary =
-                        await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
-                            UserProfileDictionary);
-                    foreach (var userId in userIdList)
+                    var userProfileRecord = await userProfileDictionary.TryGetValueAsync(tx, userId);
+                    if (userProfileRecord.HasValue)
                     {
-                        var userProfileRecord = await userProfileDictionary.TryGetValueAsync(tx, userId);
-                        if (userProfileRecord.HasValue)
-                        {
-                            experts.Add(JsonConvert.DeserializeObject<Expert>(userProfileRecord.Value));
-                        }
+                        experts.Add(JsonConvert.DeserializeObject<Expert>(userProfileRecord.Value));
                     }
-                    await tx.CommitAsync();
                 }
 
-                return experts;
+                await tx.CommitAsync();
             }
-            catch (Exception e)
-            {
-                ServiceEventSource.Current.Message(e.ToString());
-                return Enumerable.Empty<Expert>();
-            }
+
+            return experts;
         }
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
@@ -128,7 +123,7 @@
             try
             {
                 await this.faceDetection.Initialize;
-                await Task.Factory.StartNew(this.ProcessTrainingRequests, cancellationToken);
+                //await Task.Factory.StartNew(this.ProcessTrainingRequests, cancellationToken);
                 cancellationToken.WaitHandle.WaitOne();
             }
             catch (Exception e)
