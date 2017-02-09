@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Fabric;
     using System.Linq;
     using System.Threading;
@@ -20,6 +21,7 @@
     internal sealed class Detection : StatefulService, IExpertFinderOperations
     {
         private const string UserProfileDictionary = "expertprofiles";
+        private const string ResponseDictionary = "responsedictionary";
         private const string TrainingRequestsQueue = "trainingrequests";
 
         private readonly StatefulServiceContext context;
@@ -149,6 +151,7 @@
 
                     await tx.CommitAsync();
                 }
+
                 Thread.Sleep(TimeSpan.FromSeconds(5));
             }
         }
@@ -163,6 +166,39 @@
             {
                 return ex.ToString();
             }
+        }
+
+        public async Task SaveResponse(FaceDetectionResponse faceDetectionResponse)
+        {
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var serializedString = JsonConvert.SerializeObject(faceDetectionResponse);
+                var responseDictionary =
+                    await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
+                        ResponseDictionary);
+                await responseDictionary.AddOrUpdateAsync(tx, "savedResponse", serializedString, (key, value) => serializedString);
+                await tx.CommitAsync();
+            }
+        }
+
+        public async Task<FaceDetectionResponse> GetLastSavedResponse()
+        {
+            var savedResponse = new FaceDetectionResponse { DetectedExperts = new List<Expert>() };
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var responseDictionary =
+                    await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
+                        ResponseDictionary);
+                var response = await responseDictionary.TryGetValueAsync(tx, "savedResponse");
+                if (response.HasValue)
+                {
+                    savedResponse = JsonConvert.DeserializeObject<FaceDetectionResponse>(response.Value);
+                }
+
+                await tx.CommitAsync();
+            }
+
+            return savedResponse;
         }
     }
 }

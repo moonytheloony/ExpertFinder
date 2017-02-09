@@ -42,9 +42,15 @@
                 CloudStorageAccount.Parse(this.configuration["ConnectionString:StorageConnectionString"]);
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference("registration");
+            container.CreateIfNotExists();
             var blockBlob = container.GetBlockBlobReference("log.txt");
-            var lastBlob = await blockBlob.DownloadTextAsync();
-            return this.Json(lastBlob);
+            if (blockBlob.Exists())
+            {
+                var lastBlob = await blockBlob.DownloadTextAsync();
+                return this.Json(lastBlob);
+            }
+
+            return this.Json(new { });
         }
 
         public IActionResult Index()
@@ -64,6 +70,7 @@
                     CloudStorageAccount.Parse(this.configuration["ConnectionString:StorageConnectionString"]);
                 var blobClient = storageAccount.CreateCloudBlobClient();
                 var container = blobClient.GetContainerReference("registration");
+                container.CreateIfNotExists();
                 var blockBlob = container.GetBlockBlobReference(imageName);
                 var imageBytes = ConvertHexToBytes(hexString);
                 await blockBlob.UploadFromByteArrayAsync(imageBytes, 0, imageBytes.Length);
@@ -96,6 +103,11 @@
         [HttpPost]
         public async Task<IActionResult> Submit()
         {
+            // Choose album or single image.
+            if (this.Request.Form["ProfilePicBlobUrl"].ToString() == string.Empty)
+            {
+                var album = this.Request.Form["Album"];
+            }
             var expert = new Expert
             {
                 Email = this.Request.Form["Email"].ToString(),
@@ -126,6 +138,12 @@
 
             this.TempData["SubmissionStatus"] = "Details saved successfully.";
             return this.RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Dashboard()
+        {
+            var report = await this.communication.GetDashboardReport();
+            return this.View(report);
         }
 
         public async Task<IActionResult> ValidateImage()

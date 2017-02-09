@@ -5,7 +5,7 @@
   </Section>
   <Section Name="ReplicatorSecurityConfig" />
   <Section Name="ApplicationSettings">
-    <Parameter Name="FaceDetectionApiKey" Value="00f40fca74ee403c95ab66c98d24a9c2" />
+    <Parameter Name="FaceDetectionApiKey" Value="b26ab9c6e6b24ebc833f99399dc3a6dd" />
     <Parameter Name="FaceDetectionGroupId" Value="igniteexperts1" />
     <Parameter Name="FaceDetectionGroupName" Value="experts1" />
   </Section>

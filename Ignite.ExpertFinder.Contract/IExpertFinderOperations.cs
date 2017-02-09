@@ -16,5 +16,9 @@ namespace Ignite.ExpertFinder.Contract
         Task<IEnumerable<Expert>> DetectExperts(string imageUri);
 
         Task<string> ValidateImage(string imageUri);
+
+        Task SaveResponse(FaceDetectionResponse faceDetectionResponse);
+
+        Task<FaceDetectionResponse> GetLastSavedResponse();
     }
 }

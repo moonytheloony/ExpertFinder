@@ -3,7 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Fabric;
+    using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Threading.Tasks;
 
     using Ignite.ExpertFinder.Contract;
@@ -36,15 +38,35 @@
             {
                 var experts = await this.detectionServiceClient.DetectExperts(imageUri);
                 var verdictExperts = experts as IList<Expert> ?? experts.ToList();
+                foreach (var expert in verdictExperts)
+                {
+                    var webClient = new WebClient();
+                    expert.ProfilePicBase64Encoded = Convert.ToBase64String(webClient.DownloadData(expert.ProfilePicBlobUrl));
+                }
+
                 verdict.IsFaceDetected = verdictExperts.Any();
                 verdict.Experts = verdictExperts;
+
+                // save the result in dictionary so that it can be displayed on dashboard.
+                var faceDetectionResponse = new FaceDetectionResponse
+                {
+                    DetectedExperts = verdictExperts,
+                    CapturedImage = new Uri(imageUri),
+                    ResponseTime = DateTime.UtcNow
+                };
+                await this.detectionServiceClient.SaveResponse(faceDetectionResponse);
                 return verdict;
             }
             catch (Exception e)
             {
-               verdict.Message = e.ToString();
+                verdict.Message = e.ToString();
                 return verdict;
             }
+        }
+
+        public async Task<FaceDetectionResponse> GetDashboardReport()
+        {
+            return await this.detectionServiceClient.GetLastSavedResponse();
         }
     }
 }

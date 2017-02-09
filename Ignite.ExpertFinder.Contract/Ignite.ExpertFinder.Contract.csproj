@@ -60,6 +60,7 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FaceDetectionResponse.cs" />
     <Compile Include="IExpertFinderOperations.cs" />
     <Compile Include="Expert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

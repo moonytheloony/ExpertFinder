@@ -58,7 +58,7 @@
         return false;
     }
     function Upload() {
-        var file = document.querySelector('input[type=file]').files[0];
+        var file = document.querySelector('input[id=singlepicture]').files[0];
         var data = new FormData();
         data.append(file.name, file);
         $.ajax({
@@ -83,7 +83,7 @@
         <strong>Message! </strong>@ViewData["SubmissionStatus"]
     </div>
 }
-<h2>Step 1. Upload Your Picture</h2>
+<h2>Step 1. Upload Your Picture (Single)</h2>
 <hr />
 <div class="container-fluid">
     <div>
@@ -107,7 +107,7 @@
                 </div>
                 <br />
                 <form method="post" enctype="multipart/form-data">
-                    <input type="file" class="btn btn-default action" onchange="Upload()" />
+                    <input id="singlepicture" type="file" class="btn btn-default action" onchange="Upload()" />
                 </form>
             </div>
         </div>
@@ -160,7 +160,7 @@
             @foreach (var skill in Enum.GetValues(typeof(Skills)))
             {
                 <input name="Skills" type="checkbox" value="@skill" />
-                <label asp-for="@skill" style="margin-right:10px">@skill</label>
+                <label asp-for="@skill" style="margin-right: 10px">@skill</label>
             }
         </div>
     </div>
