@@ -94,7 +94,7 @@
         public async Task<IEnumerable<Expert>> DetectExperts(string imageUri)
         {
             var experts = new List<Expert>();
-            var userIdList = await this.faceDetection.DetectFacesInPicture(imageUri);
+            var userIdList = await this.faceDetection.DetectFacesInPicture($"{imageUri}?salt={Guid.NewGuid()}");
             using (var tx = this.StateManager.CreateTransaction())
             {
                 var userProfileDictionary =
@@ -199,6 +199,11 @@
             }
 
             return savedResponse;
+        }
+
+        public async Task ClearList()
+        {
+            await this.faceDetection.ClearGroup();
         }
     }
 }

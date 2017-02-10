@@ -114,7 +114,7 @@
                 Name = this.Request.Form["Name"].ToString(),
                 Organization = this.Request.Form["Organization"].ToString(),
                 ProfilePicBlobUrl = this.Request.Form["ProfilePicBlobUrl"].ToString(),
-                Skills = new List<Skills>()
+                Skills = new List<string>()
             };
             foreach (var skillString in this.Request.Form["Skills"].ToString().Split(','))
             {
@@ -123,7 +123,7 @@
                     continue;
                 }
 
-                expert.Skills.Add((Skills)Enum.Parse(typeof(Skills), skillString, true));
+                expert.Skills.Add(SplitCamelCase(((Skills)Enum.Parse(typeof(Skills), skillString, true)).ToString()));
             }
 
             try
@@ -163,6 +163,11 @@
             }
 
             return bytes;
+        }
+
+        public static string SplitCamelCase(string input)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(input, "([A-Z])", " $1", System.Text.RegularExpressions.RegexOptions.Compiled).Trim();
         }
     }
 }

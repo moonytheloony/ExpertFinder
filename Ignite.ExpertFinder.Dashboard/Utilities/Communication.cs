@@ -41,7 +41,8 @@
                 foreach (var expert in verdictExperts)
                 {
                     var webClient = new WebClient();
-                    expert.ProfilePicBase64Encoded = Convert.ToBase64String(webClient.DownloadData(expert.ProfilePicBlobUrl));
+                    expert.ProfilePicUrl = expert.ProfilePicBlobUrl;
+                    expert.ProfilePicBlobUrl = Convert.ToBase64String(webClient.DownloadData(expert.ProfilePicBlobUrl));
                 }
 
                 verdict.IsFaceDetected = verdictExperts.Any();
@@ -67,6 +68,11 @@
         public async Task<FaceDetectionResponse> GetDashboardReport()
         {
             return await this.detectionServiceClient.GetLastSavedResponse();
+        }
+
+        public async Task ClearList()
+        {
+            await this.detectionServiceClient.ClearList();
         }
     }
 }

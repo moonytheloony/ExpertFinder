@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.ProjectOxford.Face;
@@ -99,6 +100,13 @@
                     await this.faceServiceClient.CreatePersonGroupAsync(this.groupId, this.groupName);
                 }
             }
+        }
+
+        public async Task ClearGroup()
+        {
+            await this.faceServiceClient.DeletePersonGroupAsync(this.groupId);
+            Thread.Sleep(TimeSpan.FromSeconds(15));
+            await this.faceServiceClient.CreatePersonGroupAsync(this.groupId, this.groupName);
         }
     }
 }

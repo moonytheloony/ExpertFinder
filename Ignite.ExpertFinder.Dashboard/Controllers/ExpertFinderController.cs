@@ -18,7 +18,14 @@
         [HttpGet]
         public async Task<ActionResult> DetectExperts(string imageUri)
         {
-            return this.Ok(await this.communication.DetectExperts(imageUri));
+            return this.Ok(new { isComplete = true, detectionVerdict = await this.communication.DetectExperts(imageUri) });
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> ClearList()
+        {
+            await this.communication.ClearList();
+            return this.Ok();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Ignite.ExpertFinder.Contract
         public string Name;
         public string Organization;
         public string ProfilePicBlobUrl;
-        public string ProfilePicBase64Encoded;
-        public List<Skills> Skills;
+        public string ProfilePicUrl;
+        public List<string> Skills;
     }
 }

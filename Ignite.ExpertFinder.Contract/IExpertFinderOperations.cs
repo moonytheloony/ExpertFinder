@@ -20,5 +20,7 @@ namespace Ignite.ExpertFinder.Contract
         Task SaveResponse(FaceDetectionResponse faceDetectionResponse);
 
         Task<FaceDetectionResponse> GetLastSavedResponse();
+
+        Task ClearList();
     }
 }

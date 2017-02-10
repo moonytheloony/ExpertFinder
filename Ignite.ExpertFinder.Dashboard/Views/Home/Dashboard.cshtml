@@ -18,23 +18,27 @@ else
     foreach (var expert in Model.DetectedExperts)
     {
         <div class="row">
-            <div class="col-xs-12">
-                <div class="media">
-                    <a class="pull-left" href="#">
-                        <img alt="profilePicture" class="media-object dp img-circle" src="@expert.ProfilePicBlobUrl" style="width: 150px;height:150px;">
-                    </a>
-                    <div class="media-body">
-                        <h3 class="media-heading">@expert.Name</h3>
-                        <b>Works at @expert.Organization</b>
-                        <hr style="margin:8px auto">
+            <div class="col-md-9" style="border: 1px solid white; padding: 20px;">
+                <div class="row>">
+                    <div class="col-md-4">
+                        <img alt="image" src="@expert.ProfilePicUrl" style="width: 150px; height: 150px;">
+                        <h3><b>@expert.Name</b></h3>
+                        <i>@expert.Organization</i>
+                    </div>
+                    <div class="col-md-5">
                         @foreach (var skill in expert.Skills)
                         {
-                            <span class="label label-info">@skill</span>
+                            <i class="fa fa-2x fa-windows" style="color: white; padding-right: 5px;" aria-hidden="true"></i>
+                            @skill
+                            <br />
+                            <br />
                         }
                     </div>
                 </div>
             </div>
         </div>
+        <br />
+        <br />
     }
 }
 <h2>Image Captured By Holelens</h2>
