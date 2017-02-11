@@ -49,20 +49,31 @@
         public async Task<IList<string>> DetectFacesInPicture(string pictureUri)
         {
             var identifiedPeopleIds = new List<string>();
-            var faces = await this.faceServiceClient.DetectAsync(pictureUri);
-            var faceIds = faces.Select(face => face.FaceId).ToArray();
-            var results = await this.faceServiceClient.IdentifyAsync(this.groupId, faceIds);
-            foreach (var identifyResult in results)
+            try
             {
-                if (identifyResult.Candidates.Length == 0)
+                var faces = await this.faceServiceClient.DetectAsync(pictureUri);
+                var faceIds = faces.Select(face => face.FaceId).ToArray();
+                var results = await this.faceServiceClient.IdentifyAsync(this.groupId, faceIds);
+                foreach (var identifyResult in results)
                 {
-                    continue;
-                }
+                    if (identifyResult.Candidates.Length == 0)
+                    {
+                        continue;
+                    }
 
-                var candidateId = identifyResult.Candidates[0].PersonId;
-                var person = await this.faceServiceClient.GetPersonAsync(this.groupId, candidateId);
-                identifiedPeopleIds.Add(person.Name);
+                    var candidateId = identifyResult.Candidates[0].PersonId;
+                    var person = await this.faceServiceClient.GetPersonAsync(this.groupId, candidateId);
+                    identifiedPeopleIds.Add(person.Name);
+                }
             }
+            catch (FaceAPIException e)
+            {
+                if (e.ErrorCode.Equals("BadArgument", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new List<string>();
+                }
+            }
+          
 
             return identifiedPeopleIds;
         }
