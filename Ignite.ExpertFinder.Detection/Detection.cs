@@ -204,6 +204,18 @@
         public async Task ClearList()
         {
             await this.faceDetection.ClearGroup();
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var userProfileDictionary =
+                         await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
+                             UserProfileDictionary);
+                await userProfileDictionary.ClearAsync();
+                var responseDictionary =
+                                await this.StateManager.GetOrAddAsync<IReliableDictionary<string, string>>(
+                                    ResponseDictionary);
+                await responseDictionary.ClearAsync();
+                await tx.CommitAsync();
+            }
         }
     }
 }
