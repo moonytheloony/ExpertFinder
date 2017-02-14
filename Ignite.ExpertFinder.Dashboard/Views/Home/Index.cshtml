@@ -134,33 +134,44 @@
 <br />
 <h2>Step 3. Register Your Details</h2>
 <hr />
-<form asp-controller="Home" asp-action="Submit" method="post" class="form-horizontal" role="form">
+<form asp-controller="Home" asp-action="Submit" method="post" id="profileForm" class="form-horizontal" role="form">
     <div class="form-group">
         <label asp-for="Email" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            <input asp-for="Email" class="form-control" />
+            <input asp-for="Email" class="form-control" value="email@example.com" />
         </div>
     </div>
     <div class="form-group">
         <label asp-for="Name" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            <input asp-for="Name" class="form-control" />
+            <input asp-for="Name" class="form-control" text="Your Name" />
         </div>
     </div>
     <div class="form-group">
         <label asp-for="Organization" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            <input asp-for="Organization" class="form-control" />
+            <input asp-for="Organization" class="form-control" text="Your Organization" />
         </div>
     </div>
     <input asp-for="ProfilePicBlobUrl" type="hidden" />
     <div class="form-group">
         <label asp-for="Skills" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            @foreach (var skill in Enum.GetValues(typeof(Skills)))
-            {
-                <input name="Skills" type="checkbox" value="@skill" />
-                <label asp-for="@skill" style="margin-right: 10px">@skill</label>
+            @{
+                int uptoFive = 0;
+                foreach (var skill in Enum.GetValues(typeof(Skills)))
+                {
+                    if (uptoFive < 5)
+                    {
+                        <input name="Skills" type="checkbox" value="@skill" checked="checked" />
+                        uptoFive += 1;
+                    }
+                    else
+                    {
+                        <input name="Skills" type="checkbox" value="@skill" />
+                    }
+                    <label asp-for="@skill" style="margin-right: 10px">@skill</label>
+                }
             }
         </div>
     </div>
@@ -168,3 +179,9 @@
         <input type="submit" value="Create Profile" class="btn btn-default submit pull-right" />
     </div>
 </form>
+<script type="text/javascript">
+    $('#profileForm').submit(function () {
+        var c = confirm("Clicking OK will submit this form.");
+        return c; //you can just return c because it will be true or false
+    });
+</script>
